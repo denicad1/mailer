@@ -15,7 +15,7 @@ const { window } = new JSDOM();
 const { document } = (new JSDOM('')).window;
 global.document = document;
 var $ = jQuery = require('jquery')(window);
-sgMail.setApiKey('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');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
