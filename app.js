@@ -1,27 +1,19 @@
-if (process.env.NODE_ENV !== 'production') require('dotenv').config();
-
 var createError = require('http-errors');
 var express = require('express');
 const exphbs = require('express-handlebars')
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-const bodyParser = require('body-parser');
 const nodemailer=require('nodemailer');
 const sgMail = require('@sendgrid/mail');
-const jsdom = require('jsdom');
-const { JSDOM } = jsdom;
-const { window } = new JSDOM();
-const { document } = (new JSDOM('')).window;
-global.document = document;
-var $ = jQuery = require('jquery')(window);
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-
+const nodemailerSendgrid = require('nodemailer-sendgrid');
+const transporter = nodemailer.createTransport(nodemailerSendgrid({
+  apiKey: process.env.SENDGRID_API_KEY
+}));
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var emailRouter=require('./routes/email');
-const exp = require('constants');
-
 var app = express();
 
 // view engine setup
@@ -38,25 +30,22 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '/public')));
-app.use(bodyParser.json());
-app.use(express.json());
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/email',emailRouter);
 
 //need to finish post with form fields and then submit to see if email works. then style everything.
-app.post('/email',async(req,res)=>{
-  // const mailAccount=nodemailer.createTestAccount();
-  // const transport=nodemailer.createTransport();
-  console.log(req.body);
+app.post('/email',(req,res)=>{
+   
+ try{
  
-  const msg = {
-    to: 'denicad@msn.com', // Change to your recipient
-    from: 'denicad@msn.com', // Change to your verified sender
+  let msg={
+    to: req.body.email , 
+    from: 'denicad@msn.com', 
     subject: 'Sending with SendGrid is Fun',
-    text: 'and easy to do anywhere, even with Node.js',
-    html: '<strong>and easy to do anywhere, even with Node.js</strong>',
+    text: req.body.message,
+    html: `<strong>${req.body.message}</strong>`,
   }
   sgMail
     .send(msg)
@@ -66,7 +55,9 @@ app.post('/email',async(req,res)=>{
     .catch((error) => {
       console.error(error)
     })
-    res.render('/');
+  }catch{
+    console.log(res.body, 'failed');
+  }
 })
 
 
