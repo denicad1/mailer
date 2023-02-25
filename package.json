@@ -6,6 +6,9 @@
     "start": "node ./bin/www",
     "watch": "nodemon --ext *"
   },
+  "engines": {
+    "node": "16.17.0"
+  },
   "dependencies": {
     "@sendgrid/mail": "^7.7.0",
     "cookie-parser": "~1.4.4",
